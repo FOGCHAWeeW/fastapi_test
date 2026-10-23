@@ -29,7 +29,7 @@ class UserResponse(BaseModel):
     name: str
     age: int
 
-    class Confin:
+    class Config:
         from_attributes = True     
 
 @app.post("/users", response_model=UserResponse)
