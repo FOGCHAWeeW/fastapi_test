@@ -32,7 +32,7 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True     
 
-@app.post("/users", response_model=UserResponse)
+@router.post("/users", response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = models.User(name=user.name, age=user.age)
     db.add(db_user)
@@ -40,18 +40,18 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
-@app.get("/users", response_model=list[UserResponse])
+@router.get("/users", response_model=list[UserResponse])
 def get_users(db: Session = Depends(get_db)):
     return db.query(models.User).all()
 
-@app.get("/users/{users_id}")
+@router.get("/users/{users_id}")
 def get_user(users_id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == users_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-@app.delete("/users/{users_id}")
+@router.delete("/users/{users_id}")
 def del_user(users_id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == users_id).first()
     if not user:
@@ -60,3 +60,11 @@ def del_user(users_id: int, db: Session = Depends(get_db)):
         db.delete(user)
         db.commit()
     return {"message": f"{user.name} deleted"}
+
+@router.get("/")
+def read_root():
+    return {"message": "Привет, мир!"}
+
+@router.get("/hello/{name}")
+def say_hello(name: str):
+    return {"message": f"Привет, {name}!"}
